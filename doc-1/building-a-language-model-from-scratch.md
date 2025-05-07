@@ -10,7 +10,7 @@ The first step in building a language model is to gather a large and diverse tex
 - **Cleaning:** This includes removing irrelevant text, normalizing characters, handling punctuation, etc.
 - **Preprocessing:** Tokenization, sentence segmentation, and chunking the text into training samples.
 
-For an in-depth look at this step, see the [Data Collection & Processing.md](Data_Collection_Processing.md) file.
+For an in-depth look at this step, see the [Data Collection & Processing](data-collection-processing.md) file.
 
 ---
 
@@ -22,7 +22,7 @@ Tokenization is the process of converting raw text into smaller, discrete units 
 - **Vocabulary Size:** Deciding how many unique tokens the vocabulary will contain.
 - **Handling OOV (Out-of-Vocabulary) tokens:** How the tokenizer will deal with rare or unknown words.
 
-For a deeper dive into tokenization techniques, check the [Tokenization.md](Tokenization.md) file.
+For a deeper dive into tokenization techniques, check the [Tokenization](tokenization.md) file.
 
 ---
 
@@ -34,7 +34,7 @@ Once your data is prepared, it’s time to design the architecture of your model
 - **Choosing the Number of Layers:** Deciding how deep your model will be, based on compute resources and desired performance.
 - **Position Embeddings:** Since transformers don't have inherent sense of sequence, position embeddings are used to encode token order.
 
-For a detailed explanation of how to design and configure your model, refer to the [Model Architecture.md](Model_Architecture.md) file.
+For a detailed explanation of how to design and configure your model, refer to the [Model Architecture](model-architecture.md) file.
 
 ---
 
@@ -46,7 +46,7 @@ This is where the model learns the patterns of language. During pre-training, th
 - **Causal Language Modeling (CLM):** Used by models like GPT, where the model predicts the next token in a sequence.
 - **Other Objectives:** Examples include span corruption (T5) and permutation language modeling (XLNet).
 
-The full explanation of pre-training objectives is in the [Pre-Training Objectives.md](Pre_Training_Objectives.md) file.
+The full explanation of pre-training objectives is in the [Pre-Training Objectives](pre-training-objectives.md) file.
 
 ---
 
@@ -58,7 +58,7 @@ Pre-training a language model requires powerful hardware and efficient software 
 - **Distributed Training:** Techniques like model parallelism and data parallelism help scale training to large datasets and models.
 - **Mixed Precision:** Training with mixed precision (FP16) helps reduce memory usage and speed up training.
 
-You can find further details on infrastructure setup in the [Infrastructure.md](Infrastructure.md) file.
+You can find further details on infrastructure setup in the [Infrastructure](infrastructure.md) file.
 
 ---
 
@@ -70,7 +70,7 @@ This step is where the actual training happens. The model learns to minimize the
 - **Optimizer Choice:** AdamW is commonly used for optimization due to its ability to handle large learning rates and sparse gradients.
 - **Training Loop:** The loop involves feeding batches of tokenized text to the model, calculating gradients, and updating the weights.
 
-A detailed explanation of the training loop and optimization is available in the [Optimization_Training_Loop.md](Optimization_Training_Loop.md) file.
+A detailed explanation of the training loop and optimization is available in the [Optimization_Training_Loop](optimization-training-loop.md) file.
 
 ---
 
@@ -82,7 +82,7 @@ Monitoring the training process ensures that the model is learning as expected a
 - **Validation Evaluation:** Use a held-out validation set to evaluate how well the model generalizes.
 - **Hardware Monitoring:** Keep an eye on memory usage, GPU utilization, and other key system metrics.
 
-For more information on how to monitor and evaluate the training process, check out the [Monitoring_Evaluation.md](Monitoring_Evaluation.md) file.
+For more information on how to monitor and evaluate the training process, check out the [Monitoring_Evaluation](monitoring-evaluation.md) file.
 
 ---
 
