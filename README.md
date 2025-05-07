@@ -3,7 +3,7 @@
 Inspired after [pingvortex/Learn-ML](https://github.com/pingvortex/Learn-ML)
 ---
 You will learn the following:
-1. What is a pre-train modeland the difference between pre-train and fine-tunr models.
+1. What is a pre-train modeland the difference between pre-train and fine-tune models.
 2. How Pre-Training Works: Under the Hood
 3. Step-by-Step: Building a Language Model from Scratch
    - Data Collection & Processing 
