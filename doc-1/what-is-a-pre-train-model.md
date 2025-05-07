@@ -46,3 +46,5 @@ For example:
 
 The pre-train → fine-tune paradigm has revolutionized NLP by decoupling general language understanding from task-specific learning. It allows models to benefit from large-scale data while remaining flexible for specific applications. This architecture underpins many state-of-the-art systems and continues to drive research and performance in language technologies.
 
+---
+# NEXT TOPIC >>> [How Pre-Training Works: Under the Hood](doc-1/how-pre-training-works.md)
