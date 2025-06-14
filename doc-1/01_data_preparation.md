@@ -3,7 +3,7 @@
 
 ## Dataset: DialogMLM-50K
 
-For this project, we use the **DialogMLM** dataset—a corpus of multi-turn dialogue examples suitable for masked language modeling. While you can use any text dataset, DialogMLM-50K provides a clean and compact benchmark for fast iteration and experimentation.
+For this project, we use the **DialogMLM** dataset—a corpus of multi-turn dialogue examples suitable for masked language modeling. While you can use any text dataset, DialogMLM provides a clean and compact benchmark for fast iteration and experimentation.
 
 We load the dataset using the 🤗 HuggingFace Datasets library:
 
