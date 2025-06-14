@@ -17,7 +17,7 @@ We’ll take you through every stage of the process:
 6. **Evaluation and export**
 7. **Compatibility with popular libraries**
 
-The code examples in this series are centered around an implementation called **Open-Snowflake-G0** and **Snowflake-G0-R** series, a compact, efficient encoder-only model trained on a custom dataset called **DialogMLM**. You can use this architecture as a blueprint to develop more advanced models.
+The code examples in this series are centered around an implementation called **Open-SnowflakeCore** and **SnowflakeCore-G0-R** series, a compact, efficient encoder-only model trained on a custom dataset called **DialogMLM**. You can use this architecture as a blueprint to develop more advanced models.
 
 ## Why Build Your Own Model?
 
