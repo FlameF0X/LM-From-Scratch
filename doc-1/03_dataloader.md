@@ -1,63 +1,131 @@
 # 03 — Data Loading
 
-## Efficient Batching with PyTorch
+## Designing Your Data Loading Strategy
 
-Once the dataset is tokenized, we need to prepare it for training using PyTorch's `DataLoader`. This enables efficient mini-batching, shuffling, and prefetching.
+The data loading strategy is a critical architectural decision that affects your model's training efficiency and memory usage. This section will guide you through designing your own data loading approach.
 
-We begin by defining a custom **collate function** to assemble individual samples into batched tensors:
+## Key Design Considerations
 
+### 1. Batch Processing Strategy
+Consider these approaches:
+
+**Fixed-Size Batching**
+* Pros:
+  * Simple implementation
+  * Predictable memory usage
+  * Easy to parallelize
+* Cons:
+  * May waste memory with padding
+  * Less efficient for variable-length sequences
+
+**Dynamic Batching**
+* Pros:
+  * Memory efficient
+  * Better for variable-length sequences
+  * Can improve throughput
+* Cons:
+  * More complex implementation
+  * May introduce training instability
+  * Harder to parallelize
+
+**Bucket Batching**
+* Pros:
+  * Good balance of efficiency and simplicity
+  * Reduces padding waste
+  * Maintains training stability
+* Cons:
+  * Requires sequence length analysis
+  * May need periodic rebalancing
+  * More complex implementation
+
+### 2. Memory Management
+Design decisions for memory efficiency:
+
+* **Pin Memory**
+  * When to use: GPU training
+  * Impact: Faster data transfer
+  * Trade-off: Higher CPU memory usage
+
+* **Prefetching**
+  * When to use: Fast GPU, slow data loading
+  * Impact: Reduced idle time
+  * Trade-off: Higher memory usage
+
+* **Gradient Accumulation**
+  * When to use: Limited GPU memory
+  * Impact: Simulates larger batch sizes
+  * Trade-off: Slower training
+
+### 3. Parallelization Strategy
+Consider your hardware capabilities:
+
+* **Number of Workers**
+  * CPU-bound: More workers
+  * I/O-bound: Fewer workers
+  * Memory-bound: Balance workers with batch size
+
+* **Data Sharding**
+  * When to use: Distributed training
+  * Impact: Parallel data loading
+  * Trade-off: Increased complexity
+
+## Implementation Framework
+
+### 1. Design Your Batch Collation
 ```python
-import torch
+class CustomCollator:
+    def __init__(self, config):
+        self.max_length = config.max_length
+        self.padding_strategy = config.padding_strategy
+        self.batching_strategy = config.batching_strategy
 
-def collate_fn(batch):
-    input_ids = torch.stack([item['input_ids'] for item in batch])
-    attention_mask = torch.stack([item['attention_mask'] for item in batch])
-    return {
-        'input_ids': input_ids,
-        'attention_mask': attention_mask
-    }
+    def collate(self, batch):
+        # Your custom collation logic
+        pass
 ```
 
-This function ensures that the tensors are correctly batched and formatted for model input.
-
-## Creating the DataLoaders
-
-We create separate `DataLoader` instances for training and validation:
-
+### 2. Design Your DataLoader
 ```python
-from torch.utils.data import DataLoader
+class CustomDataLoader:
+    def __init__(self, config):
+        self.batch_size = config.batch_size
+        self.shuffle = config.shuffle
+        self.num_workers = config.num_workers
+        self.prefetch_factor = config.prefetch_factor
 
-batch_size = 4  # Can be increased with gradient accumulation
-
-train_loader = DataLoader(
-    train_ds,
-    batch_size=batch_size,
-    shuffle=True,
-    collate_fn=collate_fn,
-    pin_memory=True,
-    num_workers=1
-)
-
-val_loader = DataLoader(
-    val_ds,
-    batch_size=batch_size,
-    collate_fn=collate_fn,
-    pin_memory=True
-)
+    def create_loader(self, dataset):
+        # Your custom loader logic
+        pass
 ```
 
-* `shuffle=True` ensures randomness during training.
-* `pin_memory=True` enables faster data transfer to GPU.
-* `num_workers=1` can be tuned based on hardware for parallel data loading.
+## Performance Optimization
 
-## Optimization Tip: Tokenized Batching
+### 1. Memory Efficiency
+* Batch size optimization
+* Padding strategy
+* Memory pinning decisions
+* Worker count tuning
 
-For larger datasets, you may consider dynamically padding or bucketing sequences of similar lengths to improve memory and speed. For now, we use static padding for simplicity and reproducibility.
+### 2. Speed Optimization
+* Prefetching strategy
+* Worker count optimization
+* Sharding strategy
+* Caching decisions
 
-## Summary
+### 3. Quality Metrics
+* Data loading throughput
+* GPU utilization
+* Memory usage
+* Training stability
 
-* Defined a custom `collate_fn` to batch `input_ids` and `attention_mask`
-* Created separate `DataLoader`s for training and validation
-* Enabled shuffling, pinning, and multi-threaded loading
+## Next Steps
 
-With data loading in place, we’re ready to construct the model architecture itself in the next section.
+After designing your data loading strategy, you'll need to:
+1. Implement your collation logic
+2. Set up your data loader
+3. Test with your specific use case
+4. Optimize for your hardware
+
+Remember: Your data loading strategy should be designed in conjunction with your model architecture and hardware constraints. Consider the trade-offs carefully and be prepared to iterate on your design.
+
+In the next section, we'll explore how to design your model architecture to work efficiently with your data loading strategy.

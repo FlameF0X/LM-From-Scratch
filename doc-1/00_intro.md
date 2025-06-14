@@ -1,37 +1,62 @@
-
 # 00 — Introduction
 
-## Building a Language Model From Scratch
+## Designing Your Own Language Model Architecture
 
-Language models are the foundation of modern natural language processing. Whether you're working with search engines, chatbots, or document understanding systems, language models provide the ability to interpret, generate, and transform text in meaningful ways.
+Welcome to **LM-From-Scratch**! This guide will teach you how to design and build your own language model architecture from the ground up. Unlike other tutorials that focus on using existing models, here you'll learn how to create your own unique architecture that suits your specific needs.
 
-This repository, **LM-From-Scratch**, is designed to help you **understand and implement** a complete text generation model architecture from scratch, with PyTorch and HuggingFace compatibility. You won’t just learn to use models—you’ll learn how they are structured and how to build your own.
+## Why Design Your Own Architecture?
 
-We’ll take you through every stage of the process:
+Modern language models like GPT, BERT, and LLaMA are powerful, but they're designed for general purposes. By learning to design your own architecture, you can:
 
-1. **Dataset processing**
-2. **Tokenization strategy**
-3. **Efficient data loading**
-4. **Custom model architecture**
-5. **Training loop with memory optimizations**
-6. **Evaluation and export**
-7. **Compatibility with popular libraries**
+* Create models optimized for your specific use case
+* Experiment with novel approaches to language understanding
+* Build more efficient models for specialized tasks
+* Gain deep understanding of how language models work
+* Make architectural decisions based on your requirements
 
-The code examples in this series are centered around an implementation called **Open-SnowflakeCore** and **SnowflakeCore-G0-R** series, a compact, efficient encoder-only model trained on a custom dataset called **DialogMLM**. You can use this architecture as a blueprint to develop more advanced models.
+## What You'll Learn
 
-## Why Build Your Own Model?
+This guide will take you through the process of designing your own language model architecture:
 
-While pretrained models like BERT, GPT, and LLaMA are widely available, building one yourself provides key insights into:
+1. **Architectural Fundamentals**
+   - Understanding the building blocks of language models
+   - Learning to make design decisions
+   - Exploring different architectural patterns
 
-* Architectural tradeoffs
-* Memory-performance optimizations
-* Transformer internals
-* Reproducible research workflows
+2. **Component Design**
+   - Designing your own attention mechanisms
+   - Creating custom transformer blocks
+   - Developing novel positional encodings
+   - Building specialized feedforward networks
 
-Whether you're a student, researcher, or engineer, this guide is intended to equip you with the knowledge to:
+3. **Architecture Optimization**
+   - Balancing model capacity and efficiency
+   - Designing for specific hardware constraints
+   - Optimizing for your target use case
 
-* Experiment with new architectures
-* Build lightweight models for specialized tasks
-* Understand production-grade training setups
+4. **Implementation and Testing**
+   - Bringing your design to life
+   - Testing architectural decisions
+   - Iterating and improving your design
 
-Let’s get started with preparing the dataset.
+## How to Use This Guide
+
+This is not a step-by-step tutorial to build a specific model. Instead, it's a framework for learning how to design your own architecture. Each section will:
+
+* Present key concepts and design principles
+* Provide examples of different approaches
+* Guide you through making your own design decisions
+* Help you understand the implications of your choices
+
+## Getting Started
+
+The best way to use this guide is to:
+
+1. Read through the concepts
+2. Experiment with your own designs
+3. Test your architectural decisions
+4. Iterate and improve
+
+Remember: There's no "right" architecture - only the one that best serves your needs. This guide will help you develop the knowledge and skills to create your own.
+
+Let's begin with understanding the fundamental components of language model architecture.

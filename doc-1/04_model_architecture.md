@@ -1,127 +1,159 @@
 # 04 — Model Architecture
 
-## Overview
+## Designing Your Language Model Architecture
 
-Our model is a transformer-based encoder stack inspired by BERT and GPT architectures. It includes:
+This section will guide you through the process of designing your own language model architecture. We'll explore the key components and decisions that go into creating an effective model.
 
-* Token + position embeddings
-* Multi-head self-attention with fused QKV projection
-* Pre-layer normalization
-* Feed-forward networks
-* Tied output and input embeddings
+## Core Architectural Decisions
 
-We define the model in modular components:
+### 1. Model Type Selection
+Consider these fundamental approaches:
 
----
+**Encoder-Only (BERT-style)**
+* Pros:
+  * Good for understanding tasks
+  * Efficient for classification
+  * Strong at feature extraction
+* Cons:
+  * Not designed for generation
+  * Limited context window
+* Best for:
+  * Understanding tasks
+  * Feature extraction
+  * Classification
 
-## Multi-Head Self-Attention (Fused QKV)
+**Decoder-Only (GPT-style)**
+* Pros:
+  * Excellent for generation
+  * Can handle long contexts
+  * Good at few-shot learning
+* Cons:
+  * Can't see future tokens
+  * May be less efficient
+* Best for:
+  * Text generation
+  * Few-shot learning
+  * Creative tasks
 
+**Encoder-Decoder (T5-style)**
+* Pros:
+  * Flexible for many tasks
+  * Good at transformation
+  * Can handle long inputs/outputs
+* Cons:
+  * More complex
+  * Higher memory usage
+* Best for:
+  * Translation
+  * Summarization
+  * Task-specific models
+
+### 2. Component Design
+
+#### Attention Mechanism
+Consider these variations:
+* Standard self-attention
+* Sparse attention
+* Linear attention
+* Local attention
+* Global attention
+
+#### Positional Encoding
+Choose between:
+* Sinusoidal (fixed)
+* Learned
+* Rotary
+* Relative
+* ALiBi
+
+#### Normalization Strategy
+Options include:
+* Layer normalization
+* Pre-norm
+* Post-norm
+* Deep norm
+* RMS norm
+
+### 3. Architecture Scaling
+
+#### Depth vs Width
+* More layers vs wider layers
+* Attention head count
+* Feed-forward network size
+* Embedding dimension
+
+#### Efficiency Considerations
+* Memory usage
+* Computation cost
+* Training speed
+* Inference speed
+
+## Implementation Framework
+
+### 1. Design Your Base Architecture
 ```python
-class FusedQKVAttention(nn.Module):
-    def __init__(self, d_model, n_heads):
-        super().__init__()
-        self.nh = n_heads
-        self.head_dim = d_model // n_heads
-        self.qkv = nn.Linear(d_model, 3 * d_model)
-        self.wo = nn.Linear(d_model, d_model)
-
-    def forward(self, x, mask=None):
-        B, T, D = x.shape
-        qkv = self.qkv(x).reshape(B, T, 3, self.nh, self.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]
-        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.head_dim)
-        if mask is not None:
-            scores = scores.masked_fill(mask.unsqueeze(1).unsqueeze(2) == 0, float('-inf'))
-        attn = torch.softmax(scores, dim=-1)
-        context = torch.matmul(attn, v).transpose(1, 2).reshape(B, T, D)
-        return self.wo(context)
+class CustomLanguageModel(nn.Module):
+    def __init__(self, config):
+        self.model_type = config.model_type
+        self.attention_type = config.attention_type
+        self.normalization_type = config.normalization_type
+        self.positional_encoding = config.positional_encoding
+        
+    def design_attention(self):
+        # Your attention mechanism design
+        pass
+        
+    def design_positional_encoding(self):
+        # Your positional encoding design
+        pass
+        
+    def design_normalization(self):
+        # Your normalization strategy
+        pass
 ```
 
----
-
-## Feedforward Layer
-
+### 2. Design Your Components
 ```python
-class FeedForward(nn.Module):
-    def __init__(self, d_model, d_ff, dropout=0.1):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(d_model, d_ff),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(d_ff, d_model),
-            nn.Dropout(dropout)
-        )
+class CustomAttention(nn.Module):
+    def __init__(self, config):
+        self.attention_type = config.attention_type
+        self.head_count = config.head_count
+        self.head_dim = config.head_dim
 
     def forward(self, x):
-        return self.net(x)
+        # Your attention implementation
+        pass
 ```
 
----
+## Performance Considerations
 
-## Transformer Block (Pre-Norm)
+### 1. Memory Efficiency
+* Attention mechanism choice
+* Gradient checkpointing
+* Model parallelism
+* Activation checkpointing
 
-```python
-class TransformerBlock(nn.Module):
-    def __init__(self, d_model, n_heads, d_ff, dropout=0.1):
-        super().__init__()
-        self.ln1 = nn.LayerNorm(d_model)
-        self.attn = FusedQKVAttention(d_model, n_heads)
-        self.dropout1 = nn.Dropout(dropout)
-        self.ln2 = nn.LayerNorm(d_model)
-        self.ff = FeedForward(d_model, d_ff, dropout)
-        self.dropout2 = nn.Dropout(dropout)
+### 2. Computation Efficiency
+* Attention optimization
+* Feed-forward optimization
+* Kernel fusion
+* Quantization
 
-    def forward(self, x, mask=None):
-        x = x + self.dropout1(self.attn(self.ln1(x), mask))
-        x = x + self.dropout2(self.ff(self.ln2(x)))
-        return x
-```
+### 3. Training Stability
+* Normalization strategy
+* Initialization method
+* Learning rate scaling
+* Gradient clipping
 
----
+## Next Steps
 
-## SnowflakeCore: Complete Architecture
+After designing your architecture, you'll need to:
+1. Implement your core components
+2. Test your design choices
+3. Optimize for your use case
+4. Scale to your requirements
 
-```python
-class SnowflakeCore(nn.Module):
-    def __init__(self, vocab_size, max_len, d_model, n_heads, n_layers, d_ff, dropout=0.1):
-        super().__init__()
-        self.emb = nn.Embedding(vocab_size, d_model)
-        self.pe = nn.Parameter(self._build_pos_enc(max_len, d_model), requires_grad=False)
-        self.layers = nn.ModuleList([
-            TransformerBlock(d_model, n_heads, d_ff, dropout)
-            for _ in range(n_layers)
-        ])
-        self.ln_f = nn.LayerNorm(d_model)
-        self.dropout = nn.Dropout(dropout)
-        self.out = nn.Linear(d_model, vocab_size)
-        self.out.weight = self.emb.weight
+Remember: Your architecture should be designed based on your specific requirements and constraints. Consider the trade-offs carefully and be prepared to iterate on your design.
 
-    def _build_pos_enc(self, max_len, d_model):
-        pos = torch.arange(max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2) * -(math.log(10000.0) / d_model))
-        pe = torch.zeros(1, max_len, d_model)
-        pe[0, :, 0::2] = torch.sin(pos * div_term)
-        pe[0, :, 1::2] = torch.cos(pos * div_term)
-        return pe
-
-    def forward(self, input_ids, attention_mask=None):
-        x = self.emb(input_ids) + self.pe[:, :input_ids.size(1), :]
-        x = self.dropout(x)
-        for layer in self.layers:
-            x = layer(x, attention_mask)
-        x = self.ln_f(x)
-        return self.out(x)
-```
-
----
-
-## Summary
-
-* The architecture uses a transformer encoder stack with fused QKV attention and pre-layer normalization
-* Positional encodings are sinusoidal and fixed
-* Input and output embeddings are tied
-* Model supports standard attention masking for padding
-
-In the next section, we’ll configure the optimizer, gradient scaling, and learning rate scheduler for training.
+In the next section, we'll explore how to implement the attention mechanism you've designed.
 

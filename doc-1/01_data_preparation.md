@@ -1,5 +1,94 @@
-
 # 01 — Data Preparation
+
+## Understanding Data Requirements for Your Architecture
+
+Before diving into implementation, it's crucial to understand how your data choices will impact your language model architecture. This section will guide you through the key decisions you need to make when preparing data for your custom architecture.
+
+## Key Design Decisions
+
+### 1. Data Format and Structure
+Consider these questions when designing your data pipeline:
+* What type of text will your model process? (e.g., conversations, documents, code)
+* How will the structure of your data influence your architecture?
+* What special tokens or markers might you need for your specific use case?
+
+### 2. Sequence Length Considerations
+Your architecture's design will be influenced by:
+* Maximum sequence length requirements
+* Memory constraints
+* The nature of your text (e.g., short messages vs. long documents)
+* Whether you need to handle variable-length sequences
+
+### 3. Tokenization Strategy
+Different tokenization approaches affect your architecture:
+* Character-level: Simpler architecture but longer sequences
+* Word-level: More complex vocabulary management
+* Subword: Balance between vocabulary size and sequence length
+* Custom tokenization: Special requirements for your use case
+
+### 4. Data Processing Pipeline
+Design decisions for your preprocessing:
+* How to handle special cases (e.g., URLs, code, math)
+* Whether to normalize text
+* How to handle multiple languages
+* Whether to implement custom preprocessing steps
+
+## Implementation Considerations
+
+### Memory and Performance
+Your data preparation choices impact:
+* Batch size capabilities
+* Training speed
+* Memory requirements
+* Hardware requirements
+
+### Scalability
+Consider:
+* How your data pipeline will scale
+* Whether you need distributed processing
+* How to handle large datasets
+* Streaming capabilities
+
+## Example: Making Your Own Choices
+
+Here's a framework for making your own data preparation decisions:
+
+1. **Define Your Requirements**
+   ```python
+   # Example configuration
+   data_config = {
+       "max_sequence_length": 512,  # Based on your needs
+       "tokenization_method": "subword",  # Your choice
+       "special_tokens": ["<code>", "<math>"],  # Custom tokens
+       "batch_size": 32,  # Based on your hardware
+   }
+   ```
+
+2. **Design Your Processing Pipeline**
+   ```python
+   # Conceptual example
+   def custom_preprocessing(text):
+       # Your custom preprocessing steps
+       # This is where you implement your decisions
+       pass
+
+   def custom_tokenization(text):
+       # Your custom tokenization logic
+       # This is where you implement your decisions
+       pass
+   ```
+
+## Next Steps
+
+After making these decisions, you'll need to:
+1. Implement your chosen preprocessing steps
+2. Create your tokenization pipeline
+3. Design your data loading strategy
+4. Consider how these choices affect your model architecture
+
+Remember: Your data preparation choices will directly influence your architecture design. Make these decisions carefully, considering your specific use case and requirements.
+
+In the next section, we'll explore how to implement your tokenization strategy based on these decisions.
 
 ## Dataset: DialogMLM
 

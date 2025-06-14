@@ -1,83 +1,147 @@
-# 06 — Feedforward Block Deep Dive
+# 06 — Designing Your Feedforward Network
 
-## Purpose
+## Understanding Feedforward Design
 
-After the self-attention operation models relationships between tokens, each token's representation is passed through a **position-wise feedforward network (FFN)**. This module enables nonlinear transformation and local feature projection at the token level.
+The feedforward network is a crucial component that enables your model to learn complex transformations of token representations. This section will guide you through designing your own feedforward network.
 
----
+## Key Design Decisions
 
-## Structure
+### 1. Network Architecture
+Consider these fundamental approaches:
 
-Our FFN block is composed of:
+**Standard Two-Layer MLP**
+* Pros:
+  * Simple implementation
+  * Well-understood behavior
+  * Good for most tasks
+* Cons:
+  * Limited expressiveness
+  * Fixed capacity
+* Best for:
+  * General purpose models
+  * When computation is constrained
+  * When model size is limited
 
-* Linear projection from `d_model` to `ff_dim`
-* Activation function (GELU)
-* Dropout
-* Linear projection back to `d_model`
+**Multi-Layer MLP**
+* Pros:
+  * More expressive
+  * Can learn complex patterns
+  * Flexible capacity
+* Cons:
+  * More parameters
+  * Harder to train
+* Best for:
+  * Complex tasks
+  * When model size isn't constrained
+  * When you need more expressiveness
 
+**Gated Networks**
+* Pros:
+  * Better gradient flow
+  * More stable training
+  * Can learn to skip layers
+* Cons:
+  * More complex
+  * Additional parameters
+* Best for:
+  * Deep networks
+  * When training stability is crucial
+  * When you need adaptive computation
+
+### 2. Activation Function Selection
+
+#### Common Choices
+Consider:
+* GELU
+* ReLU
+* SiLU/Swish
+* Mish
+* Custom activations
+
+#### Design Considerations
+* Gradient flow
+* Computational efficiency
+* Training stability
+* Hardware compatibility
+
+### 3. Dimension Design
+
+#### Width Considerations
+* Input dimension
+* Hidden dimension
+* Output dimension
+* Expansion ratio
+
+#### Depth Considerations
+* Number of layers
+* Layer distribution
+* Skip connections
+* Residual paths
+
+## Implementation Framework
+
+### 1. Design Your Feedforward Base
 ```python
-class FeedForward(nn.Module):
-    def __init__(self, d_model, ff_dim, dropout=0.1):
-        super().__init__()
-        self.l1 = nn.Linear(d_model, ff_dim)
-        self.a = nn.GELU()
-        self.d1 = nn.Dropout(dropout)
-        self.l2 = nn.Linear(ff_dim, d_model)
-        self.d2 = nn.Dropout(dropout)
-
-    def forward(self, x):
-        return self.d2(self.l2(self.d1(self.a(self.l1(x)))))
+class CustomFeedForward(nn.Module):
+    def __init__(self, config):
+        self.architecture_type = config.architecture_type
+        self.activation_type = config.activation_type
+        self.dimension_config = config.dimension_config
+        
+    def design_layers(self):
+        # Your layer design
+        pass
+        
+    def design_activation(self):
+        # Your activation design
+        pass
+        
+    def design_connections(self):
+        # Your connection design
+        pass
 ```
 
----
-
-## Why GELU?
-
-GELU (Gaussian Error Linear Unit) is a smooth, non-linear activation function often used in transformer models. Compared to ReLU:
-
-* It better approximates the expected behavior of stochastic neurons
-* Produces smoother gradients
-* Empirically leads to improved performance in NLP tasks
-
----
-
-## Position-wise Application
-
-The FFN is applied independently to each token position:
-
-* Input: `(batch, sequence_length, d_model)`
-* Each token vector is transformed identically
-
-This design allows the model to learn **local token-specific transformations** while attention handles global interactions.
-
----
-
-## Dropout Regularization
-
-Dropout is applied after both linear layers to prevent overfitting:
-
-* Helps stabilize training
-* Encourages sparsity in intermediate representations
-
----
-
-## Integration with Residual & Norm
-
-As with attention, the FFN block is wrapped with a pre-norm and residual connection:
-
+### 2. Design Your Network Components
 ```python
-x = x + dropout(ffn(layernorm(x)))
+class NetworkComponents:
+    def __init__(self, config):
+        self.layer_count = config.layer_count
+        self.activation_type = config.activation_type
+        self.connection_type = config.connection_type
+        
+    def build_network(self):
+        # Your network building logic
+        pass
 ```
 
-This structure improves gradient stability and training convergence.
+## Performance Considerations
 
----
+### 1. Memory Efficiency
+* Layer width optimization
+* Activation memory usage
+* Gradient checkpointing
+* Parameter sharing
 
-## Summary
+### 2. Computation Efficiency
+* Activation function choice
+* Layer fusion
+* Hardware optimization
+* Parallel computation
 
-* FFN is a 2-layer MLP applied independently per token
-* GELU is used for activation, offering smoother behavior than ReLU
-* Dropout adds regularization
-* The block is wrapped in a pre-norm residual structure for training stability
+### 3. Training Stability
+* Initialization strategy
+* Gradient flow
+* Regularization
+* Layer normalization
 
-In the next section, we’ll examine how multiple blocks are stacked to form the full transformer encoder.
+## Next Steps
+
+After designing your feedforward network, you'll need to:
+1. Implement your network architecture
+2. Test different configurations
+3. Optimize for your use case
+4. Validate performance
+
+Remember: Your feedforward network should be designed based on your specific requirements and constraints. Consider the trade-offs carefully and be prepared to iterate on your design.
+
+In the next section, we'll explore how to combine your attention and feedforward components into a complete transformer block.
