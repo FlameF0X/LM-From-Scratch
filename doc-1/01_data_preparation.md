@@ -3,7 +3,7 @@
 
 ## Dataset: DialogMLM-50K
 
-For this project, we use the **DialogMLM-50K** dataset—a corpus of multi-turn dialogue examples suitable for masked language modeling. While you can use any text dataset, DialogMLM-50K provides a clean and compact benchmark for fast iteration and experimentation.
+For this project, we use the **DialogMLM** dataset—a corpus of multi-turn dialogue examples suitable for masked language modeling. While you can use any text dataset, DialogMLM-50K provides a clean and compact benchmark for fast iteration and experimentation.
 
 We load the dataset using the 🤗 HuggingFace Datasets library:
 
@@ -11,7 +11,7 @@ We load the dataset using the 🤗 HuggingFace Datasets library:
 from datasets import load_dataset
 
 # Load the dataset
-dataset = load_dataset("FlameF0X/DialogMLM-50K")
+dataset = load_dataset("FlameF0X/DialogMLM")
 ```
 
 ## Understanding the Structure
@@ -70,7 +70,7 @@ else:
 
 ## Summary
 
-* **DialogMLM-50K** is used as the base dataset
+* **DialogMLM** is used as the base dataset
 * Tokenization uses `bert-base-uncased`
 * Padding/truncation ensures fixed-length input
 * A validation split ensures robust training
