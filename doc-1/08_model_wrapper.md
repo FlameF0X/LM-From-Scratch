@@ -1,87 +1,104 @@
 # 08 — Model Wrapper and Full Architecture
 
-## Purpose
+## Understanding Model Wrapper Design
 
-The model wrapper combines multiple transformer blocks, embeddings, positional encodings, and output layers into a complete language model architecture.
+The model wrapper brings together all the core components—embeddings, positional encodings, transformer blocks, normalization, and output projection—into a complete language model architecture. This section will guide you through the key design decisions and options for composing your full model.
 
----
+## Key Design Decisions
 
-## Core Components
+### 1. Component Integration
+Consider how to combine the following:
+* **Token Embeddings**: Converts token IDs into dense vectors.
+* **Positional Encodings**: Adds position information to token embeddings.
+* **Stack of Transformer Blocks**: Multiple layers of attention and feedforward.
+* **Final Normalization**: Normalizes the output of the transformer stack.
+* **Output Projection**: Maps transformer output to vocabulary logits.
+* **Weight Tying**: Shares weights between input embeddings and output projection for parameter efficiency.
 
-1. **Token Embeddings**: Converts token IDs into dense vectors.
-2. **Positional Encodings**: Adds position information to token embeddings.
-3. **Stack of Transformer Blocks**: Multiple layers of attention and feedforward.
-4. **Final LayerNorm**: Normalizes the output of the transformer stack.
-5. **Output Projection**: Maps transformer output to vocabulary logits.
-6. **Weight Tying**: Shares weights between input embeddings and output projection for parameter efficiency.
+#### Integration Strategies
+* Sequential composition (standard)
+* Parallel or interleaved components
+* Custom routing or gating between components
 
----
+### 2. Extensibility and Modularity
+* How easy is it to swap out or extend components (e.g., custom embeddings, advanced positional encodings)?
+* Can you add features like adapters, memory modules, or custom output heads?
 
-## Implementation
+### 3. Efficiency and Scalability
+* Memory usage (e.g., weight tying, efficient parameterization)
+* Computation cost (e.g., fused operations, batch processing)
+* Support for large-scale models (e.g., model parallelism)
 
+### 4. Saving, Loading, and Compatibility
+* How will you save and load model weights and configuration?
+* Will your model be compatible with external frameworks (e.g., HuggingFace Transformers)?
+
+## Implementation Framework
+
+### 1. Design Your Model Wrapper Base
 ```python
-class SnowflakeCore(nn.Module):
-    def __init__(self, vocab_size, max_seq_len, d_model, num_heads, num_layers, ff_dim, dropout=0.1):
-        super().__init__()
-        self.emb = nn.Embedding(vocab_size, d_model)
-        self.pe = nn.Parameter(torch.zeros(1, max_seq_len, d_model))
-        
-        # Initialize sinusoidal positional encodings
-        position = torch.arange(max_seq_len).unsqueeze(1).float()
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe = torch.zeros(1, max_seq_len, d_model)
-        pe[0, :, 0::2] = torch.sin(position * div_term)
-        pe[0, :, 1::2] = torch.cos(position * div_term)
-        self.pe.data = pe.data
-        
-        self.layers = nn.ModuleList([TransformerBlock(d_model, num_heads, ff_dim, dropout) for _ in range(num_layers)])
-        
-        self.norm = nn.LayerNorm(d_model, eps=1e-6)
-        self.dropout = nn.Dropout(dropout)
-        self.fc = nn.Linear(d_model, vocab_size)
-        
-        # Weight tying
-        self.fc.weight = self.emb.weight
-        
-        # Weight initialization
-        nn.init.normal_(self.emb.weight, mean=0, std=0.02)
+class CustomModelWrapper(nn.Module):
+    def __init__(self, config):
+        self.embeddings = config.embeddings
+        self.positional_encoding = config.positional_encoding
+        self.transformer_blocks = config.transformer_blocks
+        self.normalization = config.normalization
+        self.output_projection = config.output_projection
+        self.weight_tying = config.weight_tying
+        # Additional extensibility hooks
         
     def forward(self, input_ids, attention_mask=None):
-        seq_len = input_ids.size(1)
-        x = self.emb(input_ids) + self.pe[:, :seq_len, :]
-        x = self.dropout(x)
-        
-        for layer in self.layers:
-            x = layer(x, attention_mask)
-        
-        x = self.norm(x)
-        logits = self.fc(x)
-        return logits
-    
-    def get_input_embeddings(self):
-        return self.emb
-    
-    def set_input_embeddings(self, embedding):
-        self.emb = embedding
-        self.fc.weight = embedding.weight
+        # Compose embeddings, positional encodings, transformer blocks, etc.
+        pass
     
     def save_pretrained(self, save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-        torch.save(self.state_dict(), os.path.join(save_dir, "pytorch_model.bin"))
-        # Additional save code (e.g., config, tokenizer) can be added here
+        # Your saving logic
+        pass
+
+    def load_pretrained(self, load_dir):
+        # Your loading logic
+        pass
 ```
 
----
+### 2. Design Your Component Composition
+```python
+class ModelComponents:
+    def __init__(self, config):
+        self.embeddings = config.embeddings
+        self.positional_encoding = config.positional_encoding
+        self.transformer_blocks = config.transformer_blocks
+        self.normalization = config.normalization
+        self.output_projection = config.output_projection
 
-## Notes
+    def compose_model(self):
+        # Your model composition logic
+        pass
+```
 
-* **Positional Encoding**: Fixed sinusoidal encodings injected as learned parameters for flexibility.
-* **Weight Tying**: Reduces parameters and improves generalization.
-* **LayerNorm and Dropout**: Stabilize training and regularize.
-* **Extensibility**: This wrapper makes it straightforward to add features like custom tokenizers or advanced positional embeddings.
+## Performance Considerations
 
----
+### 1. Memory Efficiency
+* Weight tying
+* Efficient parameterization
+* Gradient checkpointing
 
-## Summary
+### 2. Computation Efficiency
+* Fused operations
+* Batch processing
+* Hardware optimization
 
-This class encapsulates the entire transformer architecture, managing input embedding, positional information, stacked transformer blocks, normalization, and output projection — forming the backbone of a language model capable of text generation.
+### 3. Extensibility
+* Modular design for easy extension
+* Hooks for custom components
+
+## Next Steps
+
+After designing your model wrapper, you'll need to:
+1. Implement your component composition
+2. Test different integration strategies
+3. Optimize for your use case
+4. Validate performance
+
+Remember: Your model wrapper should be designed based on your specific requirements and constraints. Consider the trade-offs carefully and be prepared to iterate on your design.
+
+In the next section, we'll explore how to implement the training loop for your full model architecture.

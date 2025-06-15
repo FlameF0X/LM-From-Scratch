@@ -30,4 +30,4 @@ Check out the documentation in the `doc-1` directory to begin your journey in bu
 
 Contributions are welcome! Feel free to improve this README or any other part of the project.
 
-Version 1.1
+Version 1.2
