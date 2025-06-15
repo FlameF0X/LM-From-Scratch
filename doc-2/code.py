@@ -1,4 +1,4 @@
-// Code used for doc-2 from repo Open-SnowflakeCore
+# code from repo Open-SnowflakeCore
 
 import torch as t
 import torch.nn as n
